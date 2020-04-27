@@ -1,0 +1,86 @@
+{
+   "namespace":"salesconversion",
+   "name":"orders",
+   "type":"record",
+   "fields":[
+          {"name": "_time", "type": {
+            "type": "long",
+            "format_as_time" : "unix_long",
+            "arg.properties": {
+              "iteration": { "start": 1577836800000, "step": 10}
+            }
+          }},
+
+      {
+         "name":"orderid",
+         "type":{
+            "type":"int",
+            "arg.properties":{
+               "iteration":{
+                  "start":0
+               }
+            }
+         }
+      },
+      {
+         "name":"productid",
+         "type":{
+            "type":"string",
+            "arg.properties":{
+               "regex":"item_[1-9]{1}"
+            }
+         }
+      },
+      {
+         "name":"orderunits",
+         "type":{
+            "type":"int",
+            "arg.properties":{
+               "range":{
+                  "min":1,
+                  "max":10
+               }
+            }
+         }
+      },
+      {
+         "name":"address",
+         "type":{
+            "name":"address",
+            "type":"record",
+            "fields":[
+               {
+                  "name":"city",
+                  "type":{
+                     "type":"string",
+                     "arg.properties":{
+                        "regex":"City_[1-9]{0,2}"
+                     }
+                  }
+               },
+               {
+                  "name":"state",
+                  "type":{
+                     "type":"string",
+                     "arg.properties":{
+                        "regex":"State_[1-9]{0,2}"
+                     }
+                  }
+               },
+               {
+                  "name":"zipcode",
+                  "type":{
+                     "type":"long",
+                     "arg.properties":{
+                        "range":{
+                           "min":10000,
+                           "max":99999
+                        }
+                     }
+                  }
+               }
+            ]
+         }
+      }
+   ]
+}

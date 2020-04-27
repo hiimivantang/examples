@@ -1,0 +1,51 @@
+{
+  "namespace": "salesconversion",
+  "name": "productids",
+  "type": "record",
+  "fields": [
+    {
+      "name": "productid",
+      "type": "string"
+    },
+    {
+      "name": "request",
+      "type": "string"
+    }
+  ],
+  "arg.properties": {
+    "options": [
+      {
+        "productid": "item_1",
+        "request": "GET /shirt HTTP/1.1"
+      },
+      {
+        "productid": "item_2",
+        "request": "GET /trousers HTTP/1.1"
+      },
+      {
+        "productid": "item_3",
+        "request": "GET /hat HTTP/1.1"
+      },
+      {
+        "productid": "item_4",
+        "request": "GET /scarf HTTP/1.1"
+      },
+      {
+        "productid": "item_5",
+        "request": "GET /socks HTTP/1.1"
+      },
+      {
+        "productid": "item_6",
+        "request": "GET /shoes HTTP/1.1"
+      },
+      {
+        "productid": "item_7",
+        "request": "GET /jacket HTTP/1.1"
+      },
+      {
+        "productid": "item_8",
+        "request": "GET /gloves HTTP/1.1"
+      }
+    ]
+  }
+}
