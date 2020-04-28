@@ -30,6 +30,6 @@ CREATE TABLE raw_orders_output (ROWKEY STRING key, productid varchar, event_ts b
 
 
 -- Join above two tables and calculate conversion rate
-CREATE TABLE product_conversion_rate as select l.event_ts as EVENT_TS, l.productid, l.views_per_period, r.orders_per_period, cast(l.views_per_period as DOUBLE)/cast(r.orders_per_period as DOUBLE) as conversion_rate from raw_views_output l left join raw_orders_output r on l.ROWKEY=r.ROWKEY emit changes;
+CREATE TABLE product_conversion_rate as select l.event_ts as EVENT_TS, l.productid, l.views_per_period, r.orders_per_period, cast(r.orders_per_period as DOUBLE)/cast(l.views_per_period as DOUBLE) as conversion_rate from raw_views_output l left join raw_orders_output r on l.ROWKEY=r.ROWKEY emit changes;
 
 
