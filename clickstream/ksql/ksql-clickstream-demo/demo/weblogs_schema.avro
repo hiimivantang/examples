@@ -93,20 +93,20 @@
                     "type": "string",
             "arg.properties": {
               "options": [
-                "GET /index.html HTTP/1.1",
-                "GET /site/user_status.html HTTP/1.1",
-                "GET /site/login.html HTTP/1.1",
-                "GET /site/user_status.html HTTP/1.1",
-                "GET /images/track.png HTTP/1.1",
-                "GET /images/logo-small.png HTTP/1.1",
+                //"GET /index.html HTTP/1.1",
+                //"GET /site/user_status.html HTTP/1.1",
+                //"GET /site/login.html HTTP/1.1",
+                //"GET /site/user_status.html HTTP/1.1",
+                //"GET /images/track.png HTTP/1.1",
+                //"GET /images/logo-small.png HTTP/1.1",
                 "GET /shirt HTTP/1.1",
-		"GET /trousers HTTP/1.1",
-		"GET /hat HTTP/1.1",
-		"GET /scarf HTTP/1.1",
-		"GET /socks HTTP/1.1",
-		"GET /shoes HTTP/1.1",
-		"GET /jacket HTTP/1.1",
-		"GET /gloves HTTP/1.1"
+                "GET /trousers HTTP/1.1",
+                "GET /hat HTTP/1.1",
+                "GET /scarf HTTP/1.1",
+                "GET /socks HTTP/1.1",
+                "GET /shoes HTTP/1.1",
+                "GET /jacket HTTP/1.1",
+                "GET /gloves HTTP/1.1"
               ]
             }}},
           //https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
