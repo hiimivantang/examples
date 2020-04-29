@@ -85,7 +85,7 @@
             "type": "long",
             "format_as_time" : "unix_long",
             "arg.properties": {
-              "iteration": { "start": 1577836800000, "step": 10}
+              "iteration": { "start": 1577836800000, "step": 1000}
             }
           }},
 
