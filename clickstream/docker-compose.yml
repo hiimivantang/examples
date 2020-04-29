@@ -84,7 +84,7 @@ services:
 
       CONNECT_HOST: ksqldb-server
       ELASTIC_HOST: elasticsearch
-	  GRAFANA_HOST: grafana
+      GRAFANA_HOST: grafana
     # If you want to use the Confluent Hub installer to d/l component, but make them available
     # when running this offline, spin up the stack once and then run : 
     #   docker cp ksqldb:/usr/share/confluent-hub-components ./data/connect-jars
@@ -124,16 +124,16 @@ services:
      - $PWD/ksql/ksql-clickstream-demo/demo:/scripts
 
   grafana:
-	container_name: grafana
-	image: grafana/grafana:5.2.4
-	ports:
-	  - 3000:3000
-	environment:
-	  GRAFANA_HOST: grafana
-	  GF_SECURITY_ADMIN_USER: user
-	  GF_SECURITY_ADMIN_PASSWORD: user
-	volumes:
-	 - $PWD/ksql/ksql-clickstream-demo/demo:/scripts
+    container_name: grafana
+    image: grafana/grafana:5.2.4
+    ports:
+      - 3000:3000
+    environment:
+      GRAFANA_HOST: grafana
+      GF_SECURITY_ADMIN_USER: user
+      GF_SECURITY_ADMIN_PASSWORD: user
+    volumes:
+     - $PWD/ksql/ksql-clickstream-demo/demo:/scripts
 
   control-center:
     image: ${REPOSITORY}/cp-enterprise-control-center:${CONFLUENT_DOCKER_TAG}
