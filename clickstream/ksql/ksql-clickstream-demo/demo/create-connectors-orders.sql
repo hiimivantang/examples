@@ -3,7 +3,7 @@ CREATE SOURCE CONNECTOR datagen_product_ids WITH (
   'kafka.topic'              = 'productids',
   'schema.filename'          = '/scripts/product_ids_schema.avro',
   'schema.keyfield'          = 'request',
-  'maxInterval'              = '1000',
+  'maxInterval'              = '10000',
   'interations'              = '100',
   'format'                   = 'json');
 
