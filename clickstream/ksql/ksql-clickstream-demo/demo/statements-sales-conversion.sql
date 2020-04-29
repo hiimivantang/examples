@@ -23,13 +23,12 @@ CREATE TABLE views_per_product AS SELECT CAST(WINDOWEND as STRING) + '_' + CAST(
 CREATE TABLE orders_per_product AS SELECT CAST(WINDOWEND as STRING) + '_' + CAST(productid as STRING) AS KEY, WINDOWEND as event_ts, productid, count_distinct(orderid) AS orders_per_period from orders WINDOW HOPPING ( size 60 second, advance by 5  second) GROUP BY productid;
 
 
---CREATE TABLE raw_views_output (ROWKEY STRING key, productid varchar, event_ts bigint, views_per_period int) WITH (kafka_topic='VIEWS_PER_PRODUCT', value_format= 'json');
+CREATE TABLE raw_views_output (ROWKEY STRING key, productid varchar, event_ts bigint, views_per_period int) WITH (kafka_topic='VIEWS_PER_PRODUCT', value_format= 'json');
+
+CREATE TABLE raw_orders_output (ROWKEY STRING key, productid varchar, event_ts bigint, orders_per_period int) WITH (kafka_topic='ORDERS_PER_PRODUCT', value_format= 'json');
 
 
---CREATE TABLE raw_orders_output (ROWKEY STRING key, productid varchar, event_ts bigint, orders_per_period int) WITH (kafka_topic='ORDERS_PER_PRODUCT', value_format= 'json');
-
-
--- Join above two tables and calculate conversion rate
---CREATE TABLE product_conversion_rate as select l.productid as KEY, l.event_ts as EVENT_TS, l.views_per_period, r.orders_per_period, cast(r.orders_per_period as DOUBLE)/cast(l.views_per_period as DOUBLE) as conversion_rate from raw_views_output l left join raw_orders_output r on l.ROWKEY=r.ROWKEY emit changes;
+--Join above two tables and calculate conversion rate
+CREATE TABLE product_conversion_rate as select l.productid as KEY, l.productid as productid, l.event_ts as EVENT_TS, l.views_per_period, r.orders_per_period, cast(r.orders_per_period as DOUBLE)/cast(l.views_per_period as DOUBLE) as conversion_rate from raw_views_output l left join raw_orders_output r on l.ROWKEY=r.ROWKEY emit changes;
 
 
