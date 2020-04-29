@@ -13,6 +13,9 @@ docker-compose up -d
 echo -e "\nSleeping 60 seconds while Docker containers start\n"
 sleep 60
 
+sed -i '' -E "s/[0-9]{13}/$(date +%s000)/" ksql/ksql-clickstream-demo/demo/orders_schema.avro
+sed -i '' -E "s/[0-9]{13}/$(date +%s000)/" ksql/ksql-clickstream-demo/demo/weblogs_schema.avro
+
 # Run the source connectors (with ksqlDB CLI) that generate data
 docker-compose exec ksqldb-cli bash -c "ksql http://ksqldb-server:8088 <<EOF
 run script '/scripts/create-connectors-orders.sql';
