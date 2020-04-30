@@ -13,7 +13,7 @@ CREATE SOURCE CONNECTOR datagen_salesconversion_orders WITH (
   'kafka.topic'              = 'orders',
   'schema.filename'          = '/scripts/orders_schema.avro', 
   'schema.keyfield'          = 'productid',
-  'maxInterval'              = '10000',
+  'maxInterval'              = '1000',
   'interations'              = '1000000',
   'format'                   = 'json');
 
@@ -22,6 +22,6 @@ CREATE SOURCE CONNECTOR datagen_salesconversion_weblogs WITH (
   'kafka.topic'              = 'weblogs',
   'schema.filename'          = '/scripts/weblogs_schema.avro', 
   'schema.keyfield'          = 'request',
-  'maxInterval'              = '1000',
+  'maxInterval'              = '100',
   'interations'              = '10000000',
   'format'                   = 'json');
