@@ -49,7 +49,7 @@ services:
 
   ksqldb-server:
     container_name: ksqldb-server
-    image: ${REPOSITORY}/cp-ksqldb-server:${CONFLUENT_DOCKER_TAG}
+    image: confluentinc/ksqldb-server:0.8.1
     ports: 
       - 8088:8088
       - 8083:8083
