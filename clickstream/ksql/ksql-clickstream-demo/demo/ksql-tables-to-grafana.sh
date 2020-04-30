@@ -15,7 +15,7 @@ if [[ -z "${ELASTIC_HOST}" ]]; then
   ELASTIC_HOST="localhost"
 fi
 
-declare -a tables=('output_table' 'test1a' 'test1b');
+declare -a tables=('output_table' 'test1a_table' 'test1b_table');
 for i in "${tables[@]}"
 do
     table_name=$i

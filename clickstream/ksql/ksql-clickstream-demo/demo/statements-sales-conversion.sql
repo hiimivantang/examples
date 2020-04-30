@@ -39,16 +39,48 @@ CREATE TABLE test1b AS SELECT WINDOWEND as EVENT_TS, productid, count_distinct(o
 
 
 
-create stream test1b_stream (EVENT_TS bigint, productid varchar, orders_per_period int) with (kafka_topic = 'TEST1B', value_format='json');
+create stream test1b_stream (EVENT_TS bigint, productid varchar, orders_per_period int) with (kafka_topic = 'TEST1B', value_format='json', timestamp='EVENT_TS');
 
-create stream test1a_stream (EVENT_TS bigint, productid varchar, views_per_period int) with (kafka_topic = 'TEST1A', value_format='json');
+create stream test1a_stream (EVENT_TS bigint, productid varchar, views_per_period int) with (kafka_topic = 'TEST1A', value_format='json', timestamp='EVENT_TS');
+
+
+create table test1a_table (event_ts bigint, productid varchar, views_per_period int) with (kafka_topic='TEST1A', value_format='json', timestamp='EVENT_TS', key='productid');
+
+
+create table test1b_table (event_ts bigint, productid varchar, orders_per_period int) with (kafka_topic='TEST1B', value_format='json', timestamp='EVENT_TS', key='productid');
+
+create table output_table as select l.event_ts as EVENT_TS, l.productid as PRODUCTID, l.views_per_period as VIEWS, r.orders_per_period as ORDERS, CAST(r.orders_per_period as DOUBLE)/CAST(l.views_per_period as DOUBLE) as conversion_rate from test1a_table l left join test1b_table r on l.productid=r.productid emit changes;
+
+
+
+--For rest API purposes
+
+create stream output_table_stream (event_ts bigint, productid varchar, views int, orders int, conversion_rate double) with (kafka_topic='OUTPUT_TABLE', value_format='JSON');
+
+
+create table rest_table as select productid, latest_by_offset(views), latest_by_offset(orders), latest_by_offset(conversion_rate) from output_table_stream group by productid EMIT CHANGES;
+
+
+/*
 
 --working
-CREATE stream output_stream as select l.productid as PRODUCTID, l.views_per_period as VIEWS_PER_PERIOD, r.orders_per_period as ORDERS_PER_PERIOD  from test1a_stream l left join test1b_stream r within 0 seconds on l.productid=r.productid emit changes;
+CREATE stream output_stream as select l.productid as PRODUCTID, l.views_per_period as VIEWS_PER_PERIOD, r.orders_per_period as ORDERS_PER_PERIOD  from test1a_stream l left join test1b_stream r within 1 milliseconds on l.productid=r.productid emit changes;
+
+create stream enriched_output_stream as select ROWTIME as EVENT_TS, views_per_period as views, orders_per_period as orders, CAST(orders_per_period as double)/CAST(views_per_period as double) as conversion_rate from output_stream emit changes;
+*/
+
 
 /*
 --not working
 CREATE STREAM output_stream as select l.EVENT_TS as EVENT_TS, l.productid as PRODUCTID, l.views_per_period as VIEWS_PER_PERIOD, r.orders_per_period as ORDERS_PER_PERIOD  from test1a_stream l left join test1b_stream r within 1 milliseconds on l.productid=r.productid emit changes;
 */
 
+/*
+--not working
 create table output_table as select latest_by_offset(rowtime) as EVENT_TS, productid, latest_by_offset(views_per_period) as views, latest_by_offset(orders_per_period) as orders, cast(latest_by_offset(orders_per_period) as DOUBLE)/cast(latest_by_offset(views_per_period) as DOUBLE) as conversion_rate from output_stream group by productid emit changes;
+
+create table output_table (productid varchar, views_per_period int, orders_per_period int) with (kafka_topic='OUTPUT_STREAM', value_format='json');
+
+--not working
+create table output_table as select rowtime as EVENT_TS, productid, views_per_period as views, orders_per_period as orders, cast(orders_per_period as DOUBLE)/cast(views_per_period as DOUBLE) as conversion_rate from output_stream emit changes;
+*/
