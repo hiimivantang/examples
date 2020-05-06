@@ -1,13 +1,13 @@
 -- Product id lookup for url
-CREATE TABLE product_ids (rowkey STRING KEY, productid varchar, request varchar) with (key='request', kafka_topic = 'productids', value_format = 'json');
+CREATE TABLE product_ids (rowkey STRING KEY, productid varchar, request varchar) with (key='request', kafka_topic = 'productids', value_format = 'json', replicas=3);
 
 
 -- Orders
-CREATE STREAM orders (_time bigint, orderid int, productid varchar, orderunits int, address STRUCT<city varchar, state varchar, zipcode bigint>) with (kafka_topic = 'orders', value_format = 'json', timestamp = '_time'); 
+CREATE STREAM orders (_time bigint, orderid int, productid varchar, orderunits int, address STRUCT<city varchar, state varchar, zipcode bigint>) with (kafka_topic = 'orders', value_format = 'json', timestamp = '_time', replicas=3); 
 
 
 -- Web logs
-CREATE STREAM weblogs (ip varchar, userid int, remote_user varchar, _time bigint, request varchar, status varchar, bytes varchar, referrer varchar, agent varchar) with (kafka_topic = 'weblogs', value_format = 'json', timestamp = '_time');
+CREATE STREAM weblogs (ip varchar, userid int, remote_user varchar, _time bigint, request varchar, status varchar, bytes varchar, referrer varchar, agent varchar) with (kafka_topic = 'weblogs', value_format = 'json', timestamp = '_time', replicas=3);
 
 
 --create stream enriched_orders as select productid, orderid, orderunits from orders partition by productid;
@@ -39,27 +39,31 @@ CREATE TABLE test1b AS SELECT WINDOWEND as EVENT_TS, productid, count_distinct(o
 
 
 
-create stream test1b_stream (EVENT_TS bigint, productid varchar, orders_per_period int) with (kafka_topic = 'TEST1B', value_format='json', timestamp='EVENT_TS');
+create stream test1b_stream (EVENT_TS bigint, productid varchar, orders_per_period int) with (kafka_topic = 'TEST1B', value_format='json', timestamp='EVENT_TS', replicas=3);
 
-create stream test1a_stream (EVENT_TS bigint, productid varchar, views_per_period int) with (kafka_topic = 'TEST1A', value_format='json', timestamp='EVENT_TS');
-
-
-create table test1a_table (event_ts bigint, productid varchar, views_per_period int) with (kafka_topic='TEST1A', value_format='json', timestamp='EVENT_TS', key='productid');
+create stream test1a_stream (EVENT_TS bigint, productid varchar, views_per_period int) with (kafka_topic = 'TEST1A', value_format='json', timestamp='EVENT_TS', replicas=3);
 
 
-create table test1b_table (event_ts bigint, productid varchar, orders_per_period int) with (kafka_topic='TEST1B', value_format='json', timestamp='EVENT_TS', key='productid');
+create table test1a_table (event_ts bigint, productid varchar, views_per_period int) with (kafka_topic='TEST1A', value_format='json', timestamp='EVENT_TS', key='productid', replicas=3);
 
-create table output_table as select l.event_ts as EVENT_TS, l.productid as PRODUCTID, l.views_per_period as VIEWS, r.orders_per_period as ORDERS, CAST(r.orders_per_period as DOUBLE)/CAST(l.views_per_period as DOUBLE) as conversion_rate from test1a_table l left join test1b_table r on l.productid=r.productid emit changes;
+
+create table test1b_table (event_ts bigint, productid varchar, orders_per_period int) with (kafka_topic='TEST1B', value_format='json', timestamp='EVENT_TS', key='productid', replicas=3);
+
+create table output_table as select l.event_ts as EVENT_TS, l.productid as PRODUCTID, l.views_per_period as VIEWS, r.orders_per_period as ORDERS, CAST(r.orders_per_period as DOUBLE)/CAST(l.views_per_period as DOUBLE) as conversion_rate from test1a_table l left join test1b_table r on l.productid=r.productid where l.event_ts=r.event_ts emit changes;
 
 
 
 --For rest API purposes
 
-create stream output_table_stream (event_ts bigint, productid varchar, views int, orders int, conversion_rate double) with (kafka_topic='OUTPUT_TABLE', value_format='JSON');
+--create stream output_table_stream (event_ts bigint, productid varchar, views int, orders int, conversion_rate double) with (kafka_topic='OUTPUT_TABLE', value_format='JSON', key='productid');
 
 
+
+
+/*
+--not working; views/orders/conversion rate incorrect
 create table rest_table as select productid, latest_by_offset(views), latest_by_offset(orders), latest_by_offset(conversion_rate) from output_table_stream group by productid EMIT CHANGES;
-
+*/
 
 /*
 
@@ -84,3 +88,13 @@ create table output_table (productid varchar, views_per_period int, orders_per_p
 --not working
 create table output_table as select rowtime as EVENT_TS, productid, views_per_period as views, orders_per_period as orders, cast(orders_per_period as DOUBLE)/cast(views_per_period as DOUBLE) as conversion_rate from output_stream emit changes;
 */
+
+
+
+-- EXPERIMENT
+/*
+create table view_max_event_ts as select productid, max(EVENT_TS) from output_table_stream group by productid emit changes;
+
+create table latest_view as select l.productid, latest_by_offset(l.views_per_period) from test1a_stream l inner join view_max_event_ts r on l.productid=r.productid where l.event_ts=r.KSQL_COL_1 group by l.productid emit changes;
+ 
+ */
